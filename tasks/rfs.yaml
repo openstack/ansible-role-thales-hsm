@@ -1,14 +1,14 @@
 ---
 # This role adds a new IP address to the RFS conf file
 
-- name: run script to add {{thales_client_ips}} to config.new
-  script: "{{role_path}}/files/add_ips.py --config-dir /opt/nfast/kmdata/{{thales_hsm_config_location}}/config --ips {{thales_client_ips}}"
+- name: run script to add {{ thales_client_ips }} to config.new
+  script: "{{ role_path }}/files/add_ips.py --config-dir /opt/nfast/kmdata/{{ thales_hsm_config_location }}/config --ips {{ thales_client_ips }}"
 
 - name: push new config to the HSM and check that it was successful
-  shell: "/opt/nfast/bin/cfg-pushnethsm -a {{thales_hsm_ip_address}} /opt/nfast/kmdata/{{thales_hsm_config_location}}/config/config.new && sleep 5 && diff /opt/nfast/kmdata/{{thales_hsm_config_location}}/config/config /opt/nfast/kmdata/{{thales_hsm_config_location}}/config/config.new"
+  shell: "/opt/nfast/bin/cfg-pushnethsm -a {{ thales_hsm_ip_address }} /opt/nfast/kmdata/{{ thales_hsm_config_location }}/config/config.new && sleep 5 && diff /opt/nfast/kmdata/{{ thales_hsm_config_location }}/config/config /opt/nfast/kmdata/{{ thales_hsm_config_location }}/config/config.new"  # noqa 204
   register: result
   until: result.rc == 0
   retries: 10
 
 - name: allow bootstrap server to update the RFS server
-  command: "/opt/nfast/bin/rfs-setup --gang-client --write-noauth  {{thales_bootstrap_client_ip}}"
+  command: "/opt/nfast/bin/rfs-setup --gang-client --write-noauth  {{ thales_bootstrap_client_ip }}"
