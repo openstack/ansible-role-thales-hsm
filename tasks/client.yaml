@@ -100,3 +100,6 @@
 
 - name: set up rfs_sync
   command: /opt/nfast/bin/rfs-sync --setup --no-authenticate {{ thales_rfs_server_ip_address }}
+
+- name: get keys from rfs server
+  command: /opt/nfast/bin/rfs-sync --update
