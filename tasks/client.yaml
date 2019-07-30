@@ -39,6 +39,17 @@
   args:
       creates: /opt/nfast/sbin/install
 
+- name: check for libnsl dependency
+  stat:
+    path: /lib64/libnsl.so.1
+  registers: st
+
+- name: ensure libnsl dependency is installed
+  package:
+    name: libnsl
+    state: present
+  when: not st.stat.exists
+
 - name: run installer  # noqa 306
   shell: echo "1" | /opt/nfast/sbin/install
   args:
