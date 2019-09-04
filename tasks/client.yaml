@@ -18,6 +18,13 @@
       create_home: true
       home: /opt/nfast
 
+- name: set selinux bool to allow barbican containers to access /opt/nfast
+  seboolean:
+      name: os_barbican_write_pki
+      state: yes
+      persistent: yes
+  when: ansible_os_family | lower = 'redhat'
+
 - name: Download Thales client tarball
   get_url:
       url: "{{ thales_client_tarball_location }}"
