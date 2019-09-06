@@ -23,7 +23,7 @@
       name: os_barbican_write_pki
       state: yes
       persistent: yes
-  when: ansible_os_family | lower = 'redhat'
+  when: ansible_os_family | lower == 'redhat'
 
 - name: Download Thales client tarball
   get_url:
