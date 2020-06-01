@@ -2,3 +2,4 @@
 host=review.opendev.org
 port=29418
 project=openstack/ansible-role-thales-hsm.git
+defaultbranch=stable/ussuri
