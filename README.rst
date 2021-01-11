@@ -1,7 +1,19 @@
 thales-hsm
 ==========
 
-A role to manage Thales Hardware Security Module (HSM) client software.
+This is a role to manage the client software for Entrust nShield Connect
+Hardware Security Modules (HSMs).
+
+This repo uses the "Thales" name for historical reasons:
+
+At the time when this repository was created nShield HSMs were owned by Thales.
+Since then, the nShield line of HSMs have gone through some ownership changes,
+including nCipher for some time, and currently Entrust.
+
+If you are looking for the ansible role to manage client software for
+Thales Luna Network HSMs you can find it here:
+
+https://opendev.org/openstack/ansible-role-lunasa-hsm
 
 Role Variables
 --------------
