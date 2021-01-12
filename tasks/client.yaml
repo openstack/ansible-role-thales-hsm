@@ -92,6 +92,7 @@
       content: |
           CKNFAST_OVERRIDE_SECURITY_ASSURANCES=explicitness
       force: no
+      mode: 0644
 
 - name: create snmp.conf
   copy:
@@ -99,6 +100,7 @@
       content: |
           defaultPort 21161
       force: yes
+      mode: 0644
 
 - name: enroll client to HSM
   command: /opt/nfast/bin/nethsmenroll --force {{ thales_hsm_ip_address }} {{ anonkneti.stdout_lines[0] }}
