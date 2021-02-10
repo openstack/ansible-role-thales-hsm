@@ -1,0 +1,21 @@
+---
+- name: run anonkneti to get esn for "{{ item.ip }}"
+  command: /opt/nfast/bin/anonkneti "{{ item.ip }}"
+  register: anonkneti
+
+- name: output of anonkneti
+  debug: var=anonkneti.stdout_lines
+
+- name: get the esn
+  set_fact:
+     esn: "{{ anonkneti.stdout_lines[0].split()[0] }}"
+
+- name: run script to add {{ thales_client_ips }} to config.new on "{{ item.ip }}" esn "{{ esn }}"
+  script: "{{ role_path }}/files/add_ips.py --config-dir /opt/nfast/kmdata/hsm-{{ esn }}/config --ips {{ thales_client_ips }}"
+
+- name: push new config to the HSM and check that it was successful
+  shell: "/opt/nfast/bin/cfg-pushnethsm -a {{ item.ip }} /opt/nfast/kmdata/hsm-{{ esn }}/config/config.new && sleep 5 && diff /opt/nfast/kmdata/hsm-{{ esn }}/config/config /opt/nfast/kmdata/hsm-{{ esn }}/config/config.new"  # noqa 204
+  register: result
+  until: result.rc == 0
+  retries: 10
+

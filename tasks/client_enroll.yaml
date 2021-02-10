@@ -1,0 +1,10 @@
+---
+- name: run anonkneti to get hash for "{{ item.ip }}"
+  command: /opt/nfast/bin/anonkneti "{{ item.ip }}"
+  register: anonkneti
+
+- name: output of anonkneti
+  debug: var=anonkneti.stdout_lines
+
+- name: enroll client to HSM "{{ item.ip }}"
+  command: /opt/nfast/bin/nethsmenroll --force {{ item.ip }} {{ anonkneti.stdout_lines[0] }}

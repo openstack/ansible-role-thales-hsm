@@ -79,19 +79,10 @@
       dest: /opt/nfast
       remote_src: yes
 
-- name: run anonkneti to get hash
-  command: /opt/nfast/bin/anonkneti "{{ thales_hsm_ip_address }}"
-  register: anonkneti
-
-- name: output of anonkneti
-  debug: var=anonkneti.stdout_lines
-
 - name: create cknfastrc
-  copy:
+  template:
+      src: cknfastrc.j2
       dest: /opt/nfast/cknfastrc
-      content: |
-          CKNFAST_OVERRIDE_SECURITY_ASSURANCES=explicitness
-      force: no
       mode: 0644
 
 - name: create snmp.conf
@@ -102,8 +93,9 @@
       force: yes
       mode: 0644
 
-- name: enroll client to HSM
-  command: /opt/nfast/bin/nethsmenroll --force {{ thales_hsm_ip_address }} {{ anonkneti.stdout_lines[0] }}
+- name: enroll client to hsms
+  include_tasks: client_enroll.yaml
+  loop: "{{ nshield_hsms }}"
 
 - name:  set selinux contexts for /opt/nfast
   command: restorecon -R /opt/nfast
