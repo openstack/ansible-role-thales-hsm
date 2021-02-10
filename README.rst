@@ -48,23 +48,16 @@ Role Variables
      - Full URL where a copy of the client software tarball can be downloaded.
    * - thales_client_path
      - linux/libc6_11/amd64/nfast
-     - Path tho the client software directory inside the tarball
+     - Path to the client software directory inside the tarball
    * - thales_km_data_tarball_name
      - None
      - Filename for the KM Data tarball
    * - thales_km_data_location
      - None
      - Full URL where a copy of the KM Data tarball can be downloaded.
-   * - thales_hsm_ip_address
-     - None
-     - IPv4 address for the Thales HSM.
    * - thales_rfs_ip_address
      - None
      - IPv4 address for the Thales RFS host.
-   * - thales_hsm_config_location
-     - None
-     - Unique hsm diretory name where the RFS configuration is stored.
-       (e.g. hsm-XXX-XXX-XXX)
    * - thales_client_ips
      - None
      - Whitespace separated list of IP addresses to be added to RFS config.
@@ -72,6 +65,9 @@ Role Variables
      - None
      - Bootstrap client IP address.  This IP will be allowed to update RFS
        server.
+   * - nshield_hsms
+     - None
+     - List of one or more HSM devices
 
 
 Requirements
