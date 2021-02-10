@@ -1,8 +1,17 @@
 ---
-- name: Include client installation tasks
-  include_tasks: client.yaml
-  when: thales_install_client
+- name: allow using legacy variables for backwards compatibility
+  set_fact:
+    args:
+      nshield_hsms:
+        - name: Legacy variables HSM
+          ip: "{{ thales_hsm_ip_address }}"
+  when: nshield_hsms is not defined and thales_hsm_ip_address is defined
+  notify: legacy vars warning
 
 - name: Include RFS tasks
   include_tasks: rfs.yaml
   when: thales_configure_rfs
+
+- name: Include client installation tasks
+  include_tasks: client.yaml
+  when: thales_install_client
