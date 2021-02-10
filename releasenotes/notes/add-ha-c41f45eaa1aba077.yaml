@@ -1,0 +1,12 @@
+---
+features:
+  - |
+    This version adds support for using more than one nshield HSM in load
+    sharing mode.  There is a new variable `nshield_hsms` that accepts
+    a list of HSM IP addresses.  See `vars.yaml.sample` for an example.
+    Note that HSM Pools are not supported at this time.
+deprecations:
+  - |
+    Two variables have been deprecated: `thales_hsm_ip_address` and
+    `thales_hsm_config_location`.  You should use the new `nshield_hsms` list
+    to specify these values instead.  See `vars.yaml.sample` for an example.

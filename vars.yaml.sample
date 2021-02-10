@@ -1,0 +1,17 @@
+---
+thales_client_working_dir: /tmp/thales_client_install
+thales_client_tarball_location: http://myserver.example.com/CipherTools-linux64-dev-12.40.2.tgz
+thales_client_tarball_name: CipherTools-linux64-dev-12.40.2.tgz
+thales_client_path: linux/libc6_11/amd64/nfast
+thales_client_uid:  42481
+thales_client_gid:  42481
+thales_km_data_location: http://myserver.example.com/kmdata.tar.gz
+thales_km_data_tarball_name: kmdata.tar.gz
+thales_rfs_server_ip_address: 192.168.5.20
+nshield_hsms:
+  - name: "My HSM 1"
+    ip: 192.168.1.1
+  - name: "My HSM 2"
+    ip: 192.168.1.1
+thales_rfs_user: admin
+thales_rfs_key: RSA Private key in PEM format used to log into RFS server.
