@@ -1,1 +1,5 @@
-ansible-lint
+# NOTE(elod.illes): ansible 6.0.0 introduced new rules that needs to be
+# fixed, like fqcn-builtins, etc. Due to Yoga release happens soon
+# let's just cap ansible-lint. This needs a separate fix in the future
+# to be able to remove the cap.
+ansible-lint<6.0.0
