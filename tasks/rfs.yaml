@@ -1,9 +1,9 @@
 ---
 # This role adds a new IP address to the RFS conf file
 
-- name: add client ips to hsms
-  include_tasks: rfs_register_client.yaml
+- name: Add client ips to hsms
+  ansbile.builtin.include_tasks: rfs_register_client.yaml
   loop: "{{ nshield_hsms }}"
 
-- name: allow bootstrap server to update the RFS server
-  command: "/opt/nfast/bin/rfs-setup --gang-client --write-noauth  {{ thales_bootstrap_client_ip }}"
+- name: Allow bootstrap server to update the RFS server
+  ansible.builtin.command: "/opt/nfast/bin/rfs-setup --gang-client --write-noauth  {{ thales_bootstrap_client_ip }}"
