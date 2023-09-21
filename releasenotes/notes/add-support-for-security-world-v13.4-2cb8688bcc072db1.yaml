@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    This version adds support for the latest Security World client software
+    (v13.4.4).  Older security world versions are not supported.
+deprecations:
+  - |
+    The variable `thales_client_tarball_location` has been deprecated.  Use
+    `security_world_iso_zip_url` instead.
