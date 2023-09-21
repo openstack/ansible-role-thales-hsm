@@ -32,32 +32,23 @@ Role Variables
      - false
      - Whether the role should execute the RFS configuration tasks.
    * - thales_client_working_dir
-     - /tmp/thales_client_install
+     - /tmp/security_world_install
      - Working directory in the target host.
    * - thales_client_gid
      - 42481
-     - Group ID for the thales group.
+     - Group ID for the nfast group.
    * - thales_client_uid
      - 42481
-     - User ID for the thales user.
-   * - thales_client_tarball_name
+     - User ID for the nfast user.
+   * - security_world_iso_zip_url
      - None
-     - Filename for the Thales client software tarball.
+     - URL location of the Security World ISO ZIP file.
    * - thales_client_tarball_location
      - None
-     - Full URL where a copy of the client software tarball can be downloaded.
-   * - thales_client_path
-     - linux/libc6_11/amd64/nfast
-     - Path to the client software directory inside the tarball
-   * - thales_km_data_tarball_name
-     - None
-     - Filename for the KM Data tarball
-   * - thales_km_data_location
-     - None
-     - Full URL where a copy of the KM Data tarball can be downloaded.
+     - DEPRECATED: Use security_world_iso_zip_url instead.
    * - thales_rfs_ip_address
      - None
-     - IPv4 address for the Thales RFS host.
+     - IPv4 address for the RFS host.
    * - thales_client_ips
      - None
      - Whitespace separated list of IP addresses to be added to RFS config.
@@ -74,3 +65,6 @@ Requirements
 ------------
 
  - ansible >= 2.4
+ - Security World Software v13.4.4 ISO ZIP file - The ISO file in ZIP format as
+   provided by Entrust.  This should be hosted in an HTTPS server that can be
+   accessed from the target host.
