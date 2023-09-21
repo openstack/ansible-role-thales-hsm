@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  role_name: thales_hsm
+  author: OpenStack Community
+  license: Apache-2.0
+  description: Manages Entrust nShield Connect HSMs and clients.
+  min_ansible_version: '2.8'
