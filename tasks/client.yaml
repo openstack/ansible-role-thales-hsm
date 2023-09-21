@@ -5,12 +5,12 @@
     state: directory
     mode: '755'
 
-- name: Create thales group
+- name: Create nfast group
   ansible.builtin.group:
     name: nfast
     gid: "{{ thales_client_gid }}"
 
-- name: Create thales user
+- name: Create nfast user
   ansible.builtin.user:
     name: nfast
     uid: "{{ thales_client_uid }}"
@@ -25,61 +25,47 @@
     persistent: true
   when: ansible_os_family | lower == 'redhat'
 
-- name: Download Thales client tarball
-  ansible.builtin.get_url:
-    url: "{{ thales_client_tarball_location }}"
-    dest: "{{ thales_client_working_dir }}/{{ thales_client_tarball_name }}"
-    mode: '644'
-    force: false
+- name: Ensure unzip is avaliable to unzip ISO file
+  ansible.builtin.yum:
+    name: unzip
+    state: present
 
-- name: Unpack tarball to working directory
+- name: Download and unzip Security World ISO file from given url
   ansible.builtin.unarchive:
-    src: "{{ thales_client_working_dir }}/{{ thales_client_tarball_name }}"
+    src: "{{ security_world_iso_zip_url }}"
     dest: "{{ thales_client_working_dir }}"
-    creates: "{{ thales_client_working_dir }}/{{ thales_client_path }}"
     remote_src: true
 
-- name: Unpack tarball to /opt/nfast
-  ansible.builtin.shell: |
-    for i in `find "{{ thales_client_working_dir }}/{{ thales_client_path }}" -name *.tar` ; do
-        tar -C / -xvf $i ;
-    done
-  args:
-    creates: /opt/nfast/sbin/install
+- name: Set Security World ISO file path
+  ansible.builtin.set_fact:
+    security_world_iso: "{{ thales_client_working_dir }}/{{ security_world_iso_zip_url | basename | splitext | first }}"
 
-- name: Check for libnsl dependency
-  ansible.builtin.stat:
-    path: /lib64/libnsl.so.1
-  register: st
+- name: Extract RPMs and key from Security World ISO
+  community.general.iso_extract:
+    image: "{{ security_world_iso }}"
+    dest: "{{ thales_client_working_dir }}"
+    files:
+      - linux-rpms/amd64/nShield-hwsp.rpm
+      - linux-rpms/amd64/nShield-ctls.rpm
+      - linux-rpms/amd64/nShield-ncsnmp.rpm
+      - linux-rpms/amd64/pubkey.asc
 
-- name: Ensure libnsl dependency is installed
-  ansible.builtin.package:
-    name: libnsl
+- name: Import Security World RPM key
+  ansible.builtin.rpm_key:
     state: present
-  when: not st.stat.exists
+    key: "{{ thales_client_working_dir }}/pubkey.asc"
+
+- name: Install Security World RPMs
+  ansible.builtin.yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - "{{ thales_client_working_dir }}/nShield-hwsp.rpm"
+      - "{{ thales_client_working_dir }}/nShield-ctls.rpm"
+      - "{{ thales_client_working_dir }}/nShield-ncsnmp.rpm"
 
 - name: Run installer
   ansible.builtin.shell: set -o pipefail && echo "1" | /opt/nfast/sbin/install
-  args:
-    creates: /opt/nfast/kmdata
-
-- name: Get the security world data
-  ansible.builtin.get_url:
-    url: "{{ thales_km_data_location }}"
-    dest: "/root/{{ thales_km_data_tarball_name }}"
-    mode: '644'
-    force: false
-
-- name: Remove the old km_data
-  ansible.builtin.file:
-    path: /opt/nfast/kmdata
-    state: absent
-
-- name: Replace kmdata
-  ansible.builtin.unarchive:
-    src: "/root/{{ thales_km_data_tarball_name }}"
-    dest: /opt/nfast
-    remote_src: true
 
 - name: Create cknfastrc
   ansible.builtin.template:
@@ -114,7 +100,7 @@
     var: enquiry
 
 - name: Set up rfs_sync
-  ansible.builtin.command: /opt/nfast/bin/rfs-sync --setup --no-authenticate {{ thales_rfs_server_ip_address }}
+  ansible.builtin.command: set -o pipefail && echo "yes" | /opt/nfast/bin/rfs-sync --setup {{ thales_rfs_server_ip_address }}
 
 - name: Get keys from rfs server
   ansible.builtin.command: /opt/nfast/bin/rfs-sync --update

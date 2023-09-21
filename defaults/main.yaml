@@ -1,7 +1,6 @@
 ---
 thales_install_client: false
 thales_configure_rfs: false
-thales_client_working_dir: /tmp/thales_client_install
+thales_client_working_dir: /tmp/security_world_install
 thales_client_gid: 42481
 thales_client_uid: 42481
-thales_client_path: linux/libc6_11/amd64/nfast
