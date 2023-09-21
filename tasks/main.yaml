@@ -7,6 +7,12 @@
   when: nshield_hsms is not defined and thales_hsm_ip_address is defined
   notify: Legacy vars warning
 
+- name: Allow deprecated tarball URL variable
+  ansible.builtin.set_fact:
+    security_world_iso_zip_url: "{{ thales_client_tarball_location }}"
+  when: security_world_iso_zip_url is not defined and thales_client_tarball_location is defined
+  notify: legacy vars warning
+
 - name: Include RFS tasks
   ansible.builtin.include_tasks: rfs.yaml
   when: thales_configure_rfs
