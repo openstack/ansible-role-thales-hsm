@@ -1,97 +1,85 @@
 ---
 - name: Create working directory
   file:
-      path: "{{ thales_client_working_dir }}"
-      state: directory
-      mode: 0755
+    path: "{{ thales_client_working_dir }}"
+    state: directory
+    mode: 0755
 
-- name: create thales group
-  group:
-      name: nfast
-      gid: "{{ thales_client_gid }}"
+- name: Create nfast group
+  ansible.builtin.group:
+    name: nfast
+    gid: "{{ thales_client_gid }}"
 
-- name: create thales user
-  user:
-      name: nfast
-      uid: "{{ thales_client_uid }}"
-      group: "{{ thales_client_gid }}"
-      create_home: true
-      home: /opt/nfast
+- name: Create nfast user
+  ansible.builtin.user:
+    name: nfast
+    uid: "{{ thales_client_uid }}"
+    group: "{{ thales_client_gid }}"
+    create_home: true
+    home: /opt/nfast
 
 - name: set selinux bool to allow barbican containers to access /opt/nfast
   seboolean:
-      name: os_barbican_write_pki
-      state: yes
-      persistent: yes
+    name: os_barbican_write_pki
+    state: yes
+    persistent: yes
   when: ansible_os_family | lower == 'redhat'
 
-- name: Download Thales client tarball
-  get_url:
-      url: "{{ thales_client_tarball_location }}"
-      dest: "{{ thales_client_working_dir }}/{{ thales_client_tarball_name }}"
-      force: no
-
-- name: Unpack tarball to working directory
-  unarchive:
-      src: "{{ thales_client_working_dir }}/{{ thales_client_tarball_name }}"
-      dest: "{{ thales_client_working_dir }}"
-      creates: "{{ thales_client_working_dir }}/{{ thales_client_path }}"
-      remote_src: yes
-
-- name: Unpack tarball to /opt/nfast
-  shell: |
-      for i in `find "{{ thales_client_working_dir }}/{{ thales_client_path }}" -name *.tar` ; do
-          tar -C / -xvf $i ;
-      done
-  args:
-      creates: /opt/nfast/sbin/install
-
-- name: check for libnsl dependency
-  stat:
-    path: /lib64/libnsl.so.1
-  register: st
-
-- name: ensure libnsl dependency is installed
-  package:
-    name: libnsl
+- name: Ensure unzip is avaliable to unzip ISO file
+  ansible.builtin.yum:
+    name: unzip
     state: present
-  when: not st.stat.exists
 
-- name: run installer  # noqa 306
-  shell: echo "1" | /opt/nfast/sbin/install
-  args:
-      creates: /opt/nfast/kmdata
+- name: Download and unzip Security World ISO file from given url
+  ansible.builtin.unarchive:
+    src: "{{ security_world_iso_zip_url }}"
+    dest: "{{ thales_client_working_dir }}"
+    remote_src: true
 
-- name: Get the security world data
-  get_url:
-      url: "{{ thales_km_data_location }}"
-      dest: "/root/{{ thales_km_data_tarball_name }}"
-      force: no
+- name: Set Security World ISO file path
+  ansible.builtin.set_fact:
+    security_world_iso: "{{ thales_client_working_dir }}/{{ security_world_iso_zip_url | basename | splitext | first }}"
 
-- name: remove the old km_data
-  file:
-      path: /opt/nfast/kmdata
-      state: absent
+- name: Extract RPMs and key from Security World ISO
+  community.general.iso_extract:
+    image: "{{ security_world_iso }}"
+    dest: "{{ thales_client_working_dir }}"
+    files:
+      - linux-rpms/amd64/nShield-hwsp.rpm
+      - linux-rpms/amd64/nShield-ctls.rpm
+      - linux-rpms/amd64/nShield-ncsnmp.rpm
+      - linux-rpms/amd64/pubkey.asc
 
-- name: replace kmdata
-  unarchive:
-      src: "/root/{{ thales_km_data_tarball_name }}"
-      dest: /opt/nfast
-      remote_src: yes
+- name: Import Security World RPM key
+  ansible.builtin.rpm_key:
+    state: present
+    key: "{{ thales_client_working_dir }}/pubkey.asc"
+
+- name: Install Security World RPMs
+  ansible.builtin.yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - "{{ thales_client_working_dir }}/nShield-hwsp.rpm"
+      - "{{ thales_client_working_dir }}/nShield-ctls.rpm"
+      - "{{ thales_client_working_dir }}/nShield-ncsnmp.rpm"
+
+- name: Run installer
+  ansible.builtin.shell: set -o pipefail && echo "1" | /opt/nfast/sbin/install
 
 - name: create cknfastrc
   template:
-      src: cknfastrc.j2
-      dest: /opt/nfast/cknfastrc
-      mode: 0644
+    src: cknfastrc.j2
+    dest: /opt/nfast/cknfastrc
+    mode: 0644
 
 - name: create snmp.conf
   copy:
-      dest: /opt/nfast/etc/snmp/snmp.conf
-      content: |
-          defaultPort 21161
-      force: yes
-      mode: 0644
+    dest: /opt/nfast/etc/snmp/snmp.conf
+    content: |
+        defaultPort 21161
+    force: yes
+    mode: 0644
 
 - name: enroll client to hsms
   include_tasks: client_enroll.yaml
@@ -110,8 +98,8 @@
 - name: enquiry result
   debug: var=enquiry
 
-- name: set up rfs_sync
-  command: /opt/nfast/bin/rfs-sync --setup --no-authenticate {{ thales_rfs_server_ip_address }}
+- name: Set up rfs_sync
+  ansible.builtin.shell: set -o pipefail && echo "yes" | /opt/nfast/bin/rfs-sync --setup {{ thales_rfs_server_ip_address }}
 
 - name: get keys from rfs server
   command: /opt/nfast/bin/rfs-sync --update
