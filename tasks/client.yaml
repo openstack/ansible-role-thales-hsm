@@ -59,7 +59,7 @@
   when: not st.stat.exists
 
 - name: Run installer
-  ansbile.builtin.shell: set -o pipefail && echo "1" | /opt/nfast/sbin/install
+  ansible.builtin.shell: set -o pipefail && echo "1" | /opt/nfast/sbin/install
   args:
     creates: /opt/nfast/kmdata
 
