@@ -2,7 +2,7 @@
 # This role adds a new IP address to the RFS conf file
 
 - name: Add client ips to hsms
-  ansbile.builtin.include_tasks: rfs_register_client.yaml
+  ansible.builtin.include_tasks: rfs_register_client.yaml
   loop: "{{ nshield_hsms }}"
 
 - name: Allow bootstrap server to update the RFS server
