@@ -100,7 +100,7 @@
     var: enquiry
 
 - name: Set up rfs_sync
-  ansible.builtin.command: set -o pipefail && echo "yes" | /opt/nfast/bin/rfs-sync --setup {{ thales_rfs_server_ip_address }}
+  ansible.builtin.shell: set -o pipefail && echo "yes" | /opt/nfast/bin/rfs-sync --setup {{ thales_rfs_server_ip_address }}
 
 - name: Get keys from rfs server
   ansible.builtin.command: /opt/nfast/bin/rfs-sync --update
