@@ -26,7 +26,7 @@
   when: ansible_os_family | lower == 'redhat'
 
 - name: Ensure unzip is avaliable to unzip ISO file
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: unzip
     state: present
 
@@ -56,7 +56,7 @@
     key: "{{ thales_client_working_dir }}/pubkey.asc"
 
 - name: Install Security World RPMs
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: "{{ packages }}"
   vars:
     packages:
